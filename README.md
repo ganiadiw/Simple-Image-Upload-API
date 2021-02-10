@@ -9,9 +9,12 @@ Windows (CMD) : copy .env.example .env | Linux (Bash) : cp .env.example .env
 ```
 php artisan key:generate
 ```
-Konfigurasi file .env meliputi nama database, google client id dan google client secret, (pastikan client dan secret sama dengan di frontend)
+Konfigurasi file .env meliputi nama database
 ```
 php artisan migrate
+```
+```
+php artisan storage:link
 ```
 ```
 php artisan serve
@@ -19,40 +22,40 @@ php artisan serve
 
 ## API
 
-### POST
+#### POST
 ```
 /api/image
 ```
-Isi data
+Isi form data
 ```
-image : image untuk di upload
+image : image_file (pilih file image)
 ```
 
-### GET
+#### GET
 ```
 /api/images
 ```
 
-### GET by Id
+#### GET by Id
 ```
 /api/image/{id}
 ```
-Masukkan id sesuai di database
+Masukkan id sesuai id image di database
 
-### POST
+#### POST
 ```
 /api/image/{id}
 ```
 Update image sesuai id
 
-Isi data
+Isi form data
 ```
 id : id image yang akan di ubah
-image : image untuk di upload
+image : image_file (pilih file image)
 _method : put
 ```
 
-### DELETE
+#### DELETE
 ```
 /api/image/{id}
 ```
