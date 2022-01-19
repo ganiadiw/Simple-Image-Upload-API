@@ -1,4 +1,4 @@
-## Penggunaan
+## Installation Guide
 
 ```
 composer install
@@ -9,7 +9,7 @@ Windows (CMD) : copy .env.example .env | Linux (Bash) : cp .env.example .env
 ```
 php artisan key:generate
 ```
-Konfigurasi file .env meliputi nama database
+Configure .env file
 ```
 php artisan migrate
 ```
@@ -20,42 +20,118 @@ php artisan storage:link
 php artisan serve
 ```
 
-## API
+## API Documentation
 
-#### POST
-```
-/api/image
-```
-Isi form data
-```
-image : image_file (pilih file image)
-```
+### Pre-request
+All request must include a header
 
-#### GET
-```
-/api/images
-```
+| Key    | Value            |
+| ------ | ---------------- |
+| Accept | application/json |
 
-#### GET by Id
-```
-/api/image/{id}
-```
-Masukkan id sesuai id image di database
+### API List
 
-#### POST
-```
-/api/image/{id}
-```
-Update image sesuai id
+| Method | URI              | Description |
+| ------ | ---------------- | ----------- |
+| GET    | /api/images      | Get all image data |
+| GET    | /api/images/{id} | Get specific image data |
+| POST   | /api/images      | Upload/post image |
+| POST   | /api/images/{id} | Update image |
+| DELETE | /api/images/{id} | Delete image |
 
-Isi form data
-```
-id : id image yang akan di ubah
-image : image_file (pilih file image)
-_method : put
-```
+### API Documentation
 
-#### DELETE
-```
-/api/image/{id}
-```
+* Get all image data
+
+    URI : `/api/images` <br>
+    Method : GET <br>
+    Response : 
+    ```
+    {
+        "message": "images data sucessfully loaded",
+        "data": [
+            {
+                "id": 1,
+                "image_name": "b11594c0b3c311.jpg",
+                "image_url": "url/storage/images/qKJ8Psz.jpg"
+            },
+            {
+                "id": 2,
+                "image_name": "b11594c0b3c311.jpg",
+                "image_url": "url/storage/images/qKJ8Psz.jpg"
+            }
+        ]
+    }
+    ```
+
+* Get specific image data
+
+    URI : `/api/images/{id}` <br>
+    Method : GET <br>
+    Response : 
+    ```
+    {
+        "message": "image data sucessfully loaded",
+        "data": {
+            "id": 1,
+            "image_name": "b11594c0b3c311.jpg",
+            "image_url": "url/storage/images/qKJ8Psz.jpg"
+        }
+    }
+    ```
+
+* Upload/post image
+
+    URI : `/api/images` <br>
+    Method : POST <br>
+    Parameters : form data
+
+    | Key   | Value |
+    | ----- | ----- |
+    | image | image file |
+
+    Response : 
+    ```
+    {
+        "message": "Upload image successful",
+        "data": {
+            "id": 1,
+            "image_name": "b11594c0b3c311.jpg",
+            "image_url": "url/storage/images/qKJ8Psz.jpg"
+        }
+    }
+    ```
+
+* Update image
+
+    URI : `/api/images/{id}` <br>
+    Method : POST <br>
+    Parameters : form data
+
+    | Key     | Value |
+    | ------- | ----- |
+    | image   | image file |
+    | _method | put |
+
+    Response : 
+    ```
+    {
+        "message": "Image data successfully updated",
+        "data": {
+            "id": 1,
+            "image_name": "b11594c0b3c311.jpg",
+            "image_url": "url/storage/images/qKJ8Psz.jpg"
+        }
+    }
+    ```
+
+* Delete image data
+
+    URI : `/api/images/{id}` <br>
+    Method : DELETE <br>
+    Response : 
+    ```
+    {
+        "message": "Succesfully delete image"
+    }
+    ```
