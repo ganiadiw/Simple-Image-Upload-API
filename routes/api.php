@@ -15,14 +15,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::get('/images', [ImageController::class, 'index']);
-Route::group(['prefix' => 'image'], function () {
-    Route::post('/', [ImageController::class, 'create']);
-    Route::get('/{id}', [ImageController::class, 'show']);
-    Route::put('/{id}', [ImageController::class, 'update']);
-    Route::delete('/{id}', [ImageController::class, 'destroy']);
-});
+Route::apiResource('images', ImageController::class);

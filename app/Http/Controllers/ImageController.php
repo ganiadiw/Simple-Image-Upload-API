@@ -2,128 +2,83 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ImageResource;
 use App\Models\Image;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller
 {
     public function index()
-    {
-        try {
-            $images = Image::all();
-            
-            foreach ($images as $image) {
-                $imageUrl = $image->image_path ? Storage::url($image->image_path) : null;
-                $response[] = [
-                    'id' => $image->id,
-                    'image_name' => $image->image_name,
-                    'image_url' => $imageUrl
-                ];
-            }
-
-            return response()->json($response);
-        } catch (Exception $e) {
-            return response()->json($e);
-        }
-        
+    { 
+        return ImageResource::collection(Image::paginate(10))
+                ->additional(['message' => 'images data sucessfully loaded']);
     }
 
-    public function show($id)
+    public function store(Request $request)
     {
-        try {
-            $image = Image::find($id);
+        $this->validate($request, [
+            'image' => ['required', 'image', 'mimes:png,jpg,jpeg']
+        ]);
 
-            $imageUrl = $image->image_path ? Storage::url($image->image_path) : null;
+        $image = $request->file('image');
+        $imagePath = $image->store('/images');
+        $imageName = $image->getClientOriginalName();
 
-            $response = [
-                'id' => $image['id'],
-                'image_name' => $image['image_name'],
-                'image_url' => $imageUrl
-            ];
+        $image = Image::create([
+            'image_name' => $imageName,
+            'image_path' => $imagePath,
+        ]);
 
-            return response()->json($response);
-        } catch (Exception $e) {
-            return response()->json($e);
-        }
-        
-    }
-
-    public function create(Request $request)
-    {
-        try {
-            $this->validate($request, [
-                'image' => 'image|mimes:png,jpg,jpeg'
-            ]);
-
-            if ($request->file('image')) {
-                $image = $request->file('image');
-                $imagePath = $image->store('/images');
-                $imageName = $image->getClientOriginalName();
-            } else {
-                $imagePath = null;
-                $imageName = null;
-            }
-    
-            $image = Image::create([
+        return response()->json([
+            'message' => 'Upload image successfully',
+            'data' => [
                 'image_name' => $imageName,
-                'image_path' => $imagePath,
-            ]);
-
-            return response()->json($image);
-        } catch (Exception $e) {
-            return response()->json($e);
-        }
+                'image_path' => Storage::url($imagePath)
+            ]
+        ]);
     }
 
-    public function update(Request $request, $id)
+    public function show(Image $image)
     {
-        try {
-            $this->validate($request, [
-                'id' => 'required',
-                'image' => 'image|mimes:png,jpg,jpeg'
-            ]);
-    
-            $image = $request->file('image');
-            $image_path = $image->store('/images');
-            $image_name = $image->getClientOriginalName();
-    
-            $image = Image::where('id', $id)->first();
-    
-            if ($image) {
-                Storage::delete($image['image_path']);
-            }
-    
-            Image::where('id', $id)->update([
-                'image_name' => $image_name,
-                'image_path' => $image_path,
-            ]);
-    
-            $image = Image::where('id', $id)->first()->toArray();
-    
-            $imageUrl = $image['image_path'] ? Storage::url($image['image_path']) : null;
-    
-            return response()->json([
-                'id' => $image['id'],
-                'image_name' => $image['image_name'],
-                'image_url' => $imageUrl
-            ]);
-        } catch (Exception $e) {
-            return response()->json($e);
-        }        
+        return response()->json([
+            'message' => 'Image data successfully loaded',
+            'data' => new ImageResource($image),
+        ]);        
     }
 
-    public function destroy($id)
+
+    public function update(Request $request, Image $image)
     {
-        $image = Image::findOrFail($id);
+        $this->validate($request, [
+            'image' => ['required', 'image', 'mimes:png,jpg,jpeg'],
+            '_method' => ['required']
+        ]);
 
-        if ($image) {
-            Storage::delete($image->image_path);
-        }
+        $newImage = $request->file('image');
+        $imagePath = $newImage->store('/images');
+        $imageName = $newImage->getClientOriginalName();
 
+        Storage::delete($image->image_path);
+
+        $image->update([
+            'image_name' => $imageName,
+            'image_path' => $imagePath,
+        ]);    
+
+        return response()->json([
+            'message' => 'Image data successfully updated',
+            'data' => new ImageResource($image),
+        ]); 
+    }
+
+    public function destroy(Image $image)
+    {
+        Storage::delete($image->image_path);
         $image->delete();
-
-        return response()->json('Succesfully delete image');
+        
+        return response()->json([
+            'data' => 'Succesfully delete image'
+        ]);
     }
 }
