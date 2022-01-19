@@ -31,7 +31,7 @@ class ImageController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Upload image successfully',
+            'message' => 'Upload image successful',
             'data' => [
                 'image_name' => $imageName,
                 'image_path' => Storage::url($imagePath)
